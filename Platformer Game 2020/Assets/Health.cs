@@ -28,12 +28,8 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        //Play dying animation
-
-        Destroy(gameObject);
-
-        //Disable enemy
-        GetComponent<Collider2D>().enabled = false;
-        this.enabled = false;
+        //Reset the scene
+        Application.LoadLevel(Application.loadedLevel);
+        
     }
 }
