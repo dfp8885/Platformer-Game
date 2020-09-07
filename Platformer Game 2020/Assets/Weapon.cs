@@ -17,14 +17,18 @@ public class Weapon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Get key press for ranged attack
-        if (Input.GetButtonDown("Fire1")) {
-            StartCoroutine(Shoot());
-        }
+        if (!PauseMenu.GameIsPaused) {
+            //Get key press for ranged attack
+            if (Input.GetButtonDown("Fire1"))
+            {
+                StartCoroutine(Shoot());
+            }
 
-        //Get key press for melee attack
-        if (Input.GetButtonDown("Fire2")) {
-            Melee();
+            //Get key press for melee attack
+            if (Input.GetButtonDown("Fire2"))
+            {
+                Melee();
+            }
         }
     }
 
