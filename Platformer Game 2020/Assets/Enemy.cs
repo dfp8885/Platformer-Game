@@ -13,17 +13,23 @@ public class Enemy : MonoBehaviour
     public float meleeRange = 0.5f;
     public LayerMask playerLayers;
 
-    public int damage = 25;
+    public int damage = 15;
     public int meleeRate = 1;
     float nextFire;
+
+    public HealthBar healthBar;
 
     void Start() {
         currentHealth = maxHealth;
         nextFire = Time.time;
+        healthBar.SetMaxHealth(maxHealth);
     }
 
     public void TakeDamage(int damage) {
         currentHealth -= damage;
+
+        //update health bar
+        healthBar.SetHealth(currentHealth);
 
         //set hurt animation
 
