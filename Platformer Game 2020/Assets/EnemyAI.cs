@@ -11,6 +11,11 @@ public class EnemyAI : MonoBehaviour
     public float speed = 400f;
     public float nextWaypoint = 3f;
 
+    public float bounce = 2000f;
+    public float bounceCooldown = 0.25f;
+    public bool bounceUp = true;
+    public float nextBounce;
+
     Path path;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
@@ -72,6 +77,24 @@ public class EnemyAI : MonoBehaviour
         else if (force.x <= 0.01f)
         {
             enemyGFX.localScale = new Vector3(1f, 1f, 1f);
+        }
+
+        if (Time.time > nextBounce) {
+            bounceUp = true;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D colInfo) {
+        //make the enemy bounce in the opposite direction of the collision
+        if (bounceUp) {
+            Vector2 transformPos = new Vector2(transform.position.x, transform.position.y);
+            Vector2 direction = (transformPos - colInfo.contacts[0].point).normalized;
+            Vector2 force = direction * bounce * Time.deltaTime;
+            rb.AddForce(force);
+
+            nextBounce = Time.time + bounceCooldown;
+            bounceUp = false;
+
         }
     }
 }

@@ -2107,7 +2107,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   damage: 25
-  meleeRate: 1
+  attackCooldown: 0.5
+  attackUp: 0
+  nextAttack: 0
   healthBar: {fileID: 1116791041}
 --- !u!50 &947565523
 Rigidbody2D:
@@ -2179,6 +2181,10 @@ MonoBehaviour:
   enemyGFX: {fileID: 1741163435}
   speed: 1000
   nextWaypoint: 1
+  bounce: 20000
+  bounceCooldown: 0.25
+  bounceUp: 1
+  nextBounce: 0
 --- !u!114 &947565527
 MonoBehaviour:
   m_ObjectHideFlags: 0

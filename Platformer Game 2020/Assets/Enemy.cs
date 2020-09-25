@@ -13,16 +13,17 @@ public class Enemy : MonoBehaviour
     public float meleeRange = 0.5f;
     public LayerMask playerLayers;
 
-    public int damage = 15;
-    public int meleeRate = 1;
-    float nextFire;
+    public int damage = 25;
+    public float attackCooldown = 0.5f;
+    public bool attackUp = true;
+    public float nextAttack;
 
     public HealthBar healthBar;
 
     void Start() {
         currentHealth = maxHealth;
-        nextFire = Time.time;
         healthBar.SetMaxHealth(maxHealth);
+        nextAttack = Time.time;
     }
 
     public void TakeDamage(int damage) {
@@ -49,29 +50,28 @@ public class Enemy : MonoBehaviour
     }
 
     void FixedUpdate() {
-        if (Time.time > nextFire)
-        {
-            //Detect enemies in range of attack
-            Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(meleePoint.position, meleeRange, playerLayers);
-
-            //Damage enemies
-            foreach (Collider2D player in hitPlayers)
-            {
-                player.GetComponent<Health>().TakeDamage(damage);
-            }
-            nextFire = Time.time + meleeRate;
-            animator.SetBool("Attack", true);
-        }
-        else { 
-            animator.SetBool("Attack", false);
+        if (Time.time > nextAttack){
+            attackUp = true;
         }
     }
 
+    void OnCollisionEnter2D(Collision2D colInfo) {
+        Health player = colInfo.collider.GetComponent<Health>();
+        if (player != null && attackUp)
+        {
+            player.TakeDamage(damage);
+            nextAttack = Time.time + attackCooldown;
+            attackUp = false;
+        }
+    }
+
+    /**
     void OnDrawGizmosSelected()
     {
         if (meleePoint == null)
             return;
         Gizmos.DrawWireSphere(meleePoint.position, meleeRange);
     }
+    **/
 }
 
