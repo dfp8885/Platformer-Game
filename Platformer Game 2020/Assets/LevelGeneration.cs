@@ -1,11 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class LevelGeneration : MonoBehaviour
 {
     public Transform[] startingPositions;
     public GameObject[] rooms; // index 0 --> LR, Index 1 --> LRB, Index 2 --> LRT, Index 3 --> LRTB
+
+    public GameObject player;
+    private Transform playerTransform;
+    public HealthBar playerHealth;
+
+    public CinemachineVirtualCamera vcam;
 
     private int direction;
     public float moveAmount;
@@ -21,6 +28,7 @@ public class LevelGeneration : MonoBehaviour
     public LayerMask room;
 
     private int downCounter = 0;
+    private bool built = false;
 
     private void Start()
     {
@@ -28,6 +36,17 @@ public class LevelGeneration : MonoBehaviour
         int randStartingPos = Random.Range(0, startingPositions.Length);
         transform.position = startingPositions[randStartingPos].position;
         Instantiate(rooms[3], transform.position, Quaternion.identity);
+
+        //spawn player and link the health bar UI with the player health
+        GameObject playerInstance = Instantiate(player, transform.position, Quaternion.identity);
+        playerInstance.GetComponent<Health>().healthBar = playerHealth;
+
+        playerTransform = playerInstance.transform;
+        vcam.Follow = playerTransform;
+        vcam.LookAt = playerTransform;
+
+        // set game to pause so that player cannot move until map is built
+        PauseMenu.GameIsPaused = true;
 
         direction = Random.Range(1, 6);
     }
@@ -39,6 +58,12 @@ public class LevelGeneration : MonoBehaviour
         }
         else {
             timeBtwRoom -= Time.deltaTime;
+        }
+        
+        //resume game once generation is complete and we have not already built
+        if (stopGeneration == true && !built) { 
+            PauseMenu.GameIsPaused = false;
+            built = true;
         }
     }
 
