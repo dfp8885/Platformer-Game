@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelGeneration : MonoBehaviour
 {
     public Transform[] startingPositions;
-    public GameObject[] rooms;
+    public GameObject[] rooms; // index 0 --> LR, Index 1 --> LRB, Index 2 --> LRT, Index 3 --> LRTB
 
     private int direction;
     public float moveAmount;
@@ -16,7 +16,11 @@ public class LevelGeneration : MonoBehaviour
     public float minX;
     public float maxX;
     public float minY;
-    private bool stopGeneration = false;
+    public bool stopGeneration = false;
+
+    public LayerMask room;
+
+    private int downCounter = 0;
 
     private void Start()
     {
@@ -39,12 +43,22 @@ public class LevelGeneration : MonoBehaviour
     }
 
     private void Move() {
+        //Room detection
+        Collider2D roomDetection = Physics2D.OverlapCircle(transform.position, 1, room);
+
+
         // Move right
         if (direction == 1 || direction == 2) { 
             if (transform.position.x < maxX){
+                downCounter = 0;
                 Vector2 newPos = new Vector2(transform.position.x + moveAmount, transform.position.y);
                 transform.position = newPos;
 
+                // Generate room
+                int rand = Random.Range(0, rooms.Length);
+                Instantiate(rooms[rand], transform.position, Quaternion.identity);
+
+                //Generate new direction, exclude the possiblity of moving left
                 direction = Random.Range(1, 6);
                 if (direction == 3) { direction = 2; }
                 else if (direction == 4) { direction = 5; }
@@ -56,26 +70,56 @@ public class LevelGeneration : MonoBehaviour
         else if (direction == 3 || direction == 4) { 
             if (transform.position.x > minX)
             {
+                downCounter = 0;
                 Vector2 newPos = new Vector2(transform.position.x - moveAmount, transform.position.y);
                 transform.position = newPos;
 
+
+                // Generate room
+                int rand = Random.Range(0, rooms.Length);
+                Instantiate(rooms[rand], transform.position, Quaternion.identity);
+
+                //Generate new direction, exclude possibility of moving right
                 direction = Random.Range(3, 6);
             }
             else { direction = 5; }
         }
 
         // Move down
-        else if (direction == 5) { 
+        else if (direction == 5) {
+
+            downCounter++;
+
             if (transform.position.y > minY)
             {
+                if (roomDetection.GetComponent<RoomType>().type != 1 && roomDetection.GetComponent<RoomType>().type != 3) {
+                    roomDetection.GetComponent<RoomType>().RoomDestruction();
+
+                    int randBottomRoom = Random.Range(1, 4);
+                    if (downCounter >= 2)
+                    {
+                        randBottomRoom = 3;
+                    }
+                    else {
+                        if (randBottomRoom == 2)
+                        {
+                            randBottomRoom = 1;
+                        }
+                    }
+                    
+                    Instantiate(rooms[randBottomRoom], transform.position, Quaternion.identity);
+                }
                 Vector2 newPos = new Vector2(transform.position.x, transform.position.y - moveAmount);
                 transform.position = newPos;
 
-                direction = Random.Range(3, 6);
+                // Generate room
+                int rand = Random.Range(2, 4);
+                Instantiate(rooms[rand], transform.position, Quaternion.identity);
+
+                // Generate new direction
+                direction = Random.Range(1, 6);
             }
             else { stopGeneration = true; }
         }
-
-        Instantiate(rooms[3], transform.position, Quaternion.identity);
     }
 }
