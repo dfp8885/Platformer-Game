@@ -35,10 +35,13 @@ public class LevelGeneration : MonoBehaviour
         //generate random starting positon and create first room
         int randStartingPos = Random.Range(0, startingPositions.Length);
         transform.position = startingPositions[randStartingPos].position;
-        Instantiate(rooms[3], transform.position, Quaternion.identity);
+        int rand = Random.Range(0, rooms.Length-1);
+        Instantiate(rooms[rand], transform.position, Quaternion.identity);
 
         //spawn player and link the health bar UI with the player health
+        transform.position = new Vector2(transform.position.x, transform.position.y + 2);
         GameObject playerInstance = Instantiate(player, transform.position, Quaternion.identity);
+        transform.position = new Vector2(transform.position.x, transform.position.y - 2);
         playerInstance.GetComponent<Health>().healthBar = playerHealth;
 
         playerTransform = playerInstance.transform;
@@ -71,7 +74,6 @@ public class LevelGeneration : MonoBehaviour
         //Room detection
         Collider2D roomDetection = Physics2D.OverlapCircle(transform.position, 1, room);
 
-
         // Move right
         if (direction == 1 || direction == 2) { 
             if (transform.position.x < maxX){
@@ -80,7 +82,7 @@ public class LevelGeneration : MonoBehaviour
                 transform.position = newPos;
 
                 // Generate room
-                int rand = Random.Range(0, rooms.Length);
+                int rand = Random.Range(0, rooms.Length-1);
                 Instantiate(rooms[rand], transform.position, Quaternion.identity);
 
                 //Generate new direction, exclude the possiblity of moving left
@@ -101,7 +103,7 @@ public class LevelGeneration : MonoBehaviour
 
 
                 // Generate room
-                int rand = Random.Range(0, rooms.Length);
+                int rand = Random.Range(0, rooms.Length-1);
                 Instantiate(rooms[rand], transform.position, Quaternion.identity);
 
                 //Generate new direction, exclude possibility of moving right
@@ -144,7 +146,11 @@ public class LevelGeneration : MonoBehaviour
                 // Generate new direction
                 direction = Random.Range(1, 6);
             }
-            else { stopGeneration = true; }
+            else {
+                //Remake last room into the final room
+                roomDetection.GetComponent<RoomType>().RoomDestruction();
+                Instantiate(rooms[rooms.Length-1], transform.position, Quaternion.identity);
+                stopGeneration = true; }
         }
     }
 }
