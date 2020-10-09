@@ -8,17 +8,26 @@ public class PauseMenu : MonoBehaviour
 
     public static bool GameIsPaused = false;
     public GameObject pauseMenuUI;
+    public GameObject winMenuUI;
 
     // Update is called once per frame
     void Update()
     {
+        bool win = FloorComplete.win;
         if (Input.GetButtonDown("Cancel")) {
-            if (GameIsPaused){
+            if (win){
+                LoadMenu();
+            }
+            else if (GameIsPaused) {
                 Resume();
             }
-            else {
+            else
+            {
                 Pause();
             }
+        }
+        if (win) {
+            WinGame();
         }
     }
 
@@ -37,11 +46,26 @@ public class PauseMenu : MonoBehaviour
     public void LoadMenu() {
         Time.timeScale = 1f;
         GameIsPaused = false;
+        FloorComplete.win = false;
         SceneManager.LoadScene("Menu");
     }
 
     public void QuitGame() { 
         Debug.Log("Quit");
         Application.Quit();
+    }
+
+    public void WinGame() {
+        winMenuUI.SetActive(true);
+        Time.timeScale = 0f;
+        GameIsPaused = true;
+    }
+
+    public void Restart() {
+        FloorComplete.win = false;
+        Time.timeScale = 1f;
+        GameIsPaused = false;
+        winMenuUI.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

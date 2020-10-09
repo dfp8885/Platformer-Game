@@ -19,10 +19,14 @@ public class Enemy : MonoBehaviour
     public float nextAttack;
 
     public HealthBar healthBar;
+    public bool isDead = false;
 
     void Start() {
         currentHealth = maxHealth;
-        healthBar.SetMaxHealth(maxHealth);
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+        }
         nextAttack = Time.time;
     }
 
@@ -30,9 +34,13 @@ public class Enemy : MonoBehaviour
         currentHealth -= damage;
 
         //update health bar
-        healthBar.SetHealth(currentHealth);
+        //allows for possibility of not having a health bar
+        if (healthBar != null) {
+            healthBar.SetHealth(currentHealth);
+        }
 
         //set hurt animation
+
 
         if (currentHealth <= 0) {
             Die();
@@ -41,8 +49,7 @@ public class Enemy : MonoBehaviour
 
     void Die() {
         //Play dying animation
-
-        Destroy(gameObject);
+        isDead = true;
 
         //Disable enemy
         GetComponent<Collider2D>().enabled = false;
