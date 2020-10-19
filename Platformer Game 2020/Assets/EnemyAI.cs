@@ -16,6 +16,9 @@ public class EnemyAI : MonoBehaviour
     public bool bounceUp = true;
     public float nextBounce;
 
+    public float rangeRadius = 60f;
+    public LayerMask playerLayers;
+
     Path path;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
@@ -48,40 +51,61 @@ public class EnemyAI : MonoBehaviour
 
     // Update is called once per frame
     void FixedUpdate() {
-        if (path == null) {
-            return;
+        Collider2D[] foundColliders = Physics2D.OverlapCircleAll(enemyGFX.position, rangeRadius, playerLayers);
+
+        bool playerFound = false;
+
+        foreach (Collider2D coll in foundColliders) {
+            playerFound = true;
         }
 
-        if (currentWaypoint >= path.vectorPath.Count)
+        if (playerFound)
         {
-            reachedEndOfPath = true;
-            return;
+            if (path == null)
+            {
+                return;
+            }
+
+            if (currentWaypoint >= path.vectorPath.Count)
+            {
+                reachedEndOfPath = true;
+                return;
+            }
+            else
+            {
+                reachedEndOfPath = false;
+            }
+
+            Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
+            Vector2 force = direction * speed * Time.deltaTime;
+
+            rb.AddForce(force);
+
+            float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+            if (distance < nextWaypoint)
+            {
+                currentWaypoint++;
+            }
+
+            if (force.x >= 0.01f)
+            {
+                enemyGFX.localScale = new Vector3(-1f, 1f, 1f);
+            }
+            else if (force.x <= 0.01f)
+            {
+                enemyGFX.localScale = new Vector3(1f, 1f, 1f);
+            }
+
+            if (Time.time > nextBounce)
+            {
+                bounceUp = true;
+            }
         }
         else {
-            reachedEndOfPath = false;
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
         }
 
-        Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
-        Vector2 force = direction * speed * Time.deltaTime;
-
-        rb.AddForce(force);
-
-        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
-        if(distance<nextWaypoint){
-            currentWaypoint++;
-        }
-
-        if (force.x >= 0.01f) {
-            enemyGFX.localScale = new Vector3(-1f, 1f, 1f);
-        }
-        else if (force.x <= 0.01f)
-        {
-            enemyGFX.localScale = new Vector3(1f, 1f, 1f);
-        }
-
-        if (Time.time > nextBounce) {
-            bounceUp = true;
-        }
     }
 
     void OnCollisionEnter2D(Collision2D colInfo) {
@@ -96,5 +120,10 @@ public class EnemyAI : MonoBehaviour
             bounceUp = false;
 
         }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(enemyGFX.position, rangeRadius);
     }
 }

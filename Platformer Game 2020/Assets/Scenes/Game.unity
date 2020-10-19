@@ -2114,6 +2114,7 @@ MonoBehaviour:
   attackUp: 0
   nextAttack: 0
   healthBar: {fileID: 1116791041}
+  isDead: 0
 --- !u!50 &947565523
 Rigidbody2D:
   serializedVersion: 4
@@ -2183,11 +2184,16 @@ MonoBehaviour:
   target: {fileID: 503298028}
   enemyGFX: {fileID: 1741163435}
   speed: 1000
+  stoppingForce: 600
   nextWaypoint: 1
   bounce: 20000
   bounceCooldown: 0.25
   bounceUp: 1
   nextBounce: 0
+  rangeRadius: 7
+  playerLayers:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!114 &947565527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3461,6 +3467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 2005954698}
+  winMenuUI: {fileID: 0}
 --- !u!1 &1716884529
 GameObject:
   m_ObjectHideFlags: 0
